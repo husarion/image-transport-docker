@@ -1,6 +1,6 @@
 # image-transport-docker
 
-Dockerized image_transport ROS 2 package
+Dockerized [`image_transport`](https://index.ros.org/p/image_transport/) ROS 2 package based on fork with default QOS reliability changed to `best_effort`.
 
 ## Usage
 
