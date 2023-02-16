@@ -4,13 +4,30 @@ Dockerized [`image_transport`](https://index.ros.org/p/image_transport/) ROS 2 p
 
 ## Usage
 
+### compress
+
 ```yaml
-  image_transport:
+  image_compressor:
     image: husarion/image-transport:humble
+    <<: *net-config
     command: >
-      ros2 run image_transport republish raw compressed
+      ros2 run image_transport republish raw ${CODEC:-theora}
         --ros-args
         --remap in:=/camera/color/image_raw
-        --remap out/compressed:=/camera/color/image_raw/compressed
+        --remap out/${CODEC:-theora}:=/camera/color/image_raw/${CODEC:-theora}
+    # --params-file /image_transport_params.yaml
+```
+
+### decompress
+
+```yaml
+  image_decompressor:
+    image: husarion/image-transport:humble
+    <<: *net-config
+    command: >
+      ros2 run image_transport republish ${CODEC:-theora} raw
+      --ros-args
+      --remap in/${CODEC:-theora}:=/camera/color/image_raw/${CODEC:-theora}
+      --remap out:=/camera/my_image_raw
     # --params-file /image_transport_params.yaml
 ```
