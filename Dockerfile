@@ -5,7 +5,7 @@ FROM husarnet/ros:$ROS_DISTRO-ros-base
 SHELL ["/bin/bash", "-c"]
 
 RUN git clone -b rolling https://github.com/DominikN/image_common/ src/image_common && \
-    git clone -b 2.6.0 https://github.com/ros-perception/image_transport_plugins src/image_transport_plugins && \
+    git clone -b 3.2.0 https://github.com/ros-perception/image_transport_plugins src/image_transport_plugins && \
     . /opt/ros/$ROS_DISTRO/setup.sh && \
     apt update && \
     rosdep update --rosdistro $ROS_DISTRO && \
