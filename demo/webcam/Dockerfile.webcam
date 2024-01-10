@@ -1,0 +1,31 @@
+FROM husarnet/ros:humble-ros-base AS pkg-builder
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt update && apt install -y \
+        ros-humble-cv-bridge
+
+RUN mkdir src && \
+    git clone --depth 1 https://github.com/ros-misc-utilities/ffmpeg_image_transport.git src/ffmpeg_image_transport && \
+    vcs import src < src/ffmpeg_image_transport/ffmpeg_image_transport.repos && \
+    rosdep update --rosdistro $ROS_DISTRO && \
+    rosdep install --from-paths src --ignore-src -y && \
+    source /opt/ros/$ROS_DISTRO/setup.bash && \
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release  && \
+    rm -rf build log
+
+FROM husarnet/ros:humble-ros-core
+
+# Add architecture specific packages conditionally
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        apt update && apt install -y libraspberrypi-bin; \
+    fi
+
+RUN apt update && apt install -y \
+        ros-humble-cv-bridge \
+        ros-${ROS_DISTRO}-v4l2-camera && \
+    apt clean &&  \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=pkg-builder /ros2_ws /ros2_ws
