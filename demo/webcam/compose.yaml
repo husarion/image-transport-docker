@@ -1,0 +1,40 @@
+x-cpu-config:
+  &cpu-config
+  env_file: .env.cpu
+
+x-gpu-config:
+  &gpu-config
+  runtime: nvidia
+  env_file: .env.gpu
+
+services:
+  webcam:
+    build:
+      context: .
+      dockerfile: Dockerfile.webcam
+    <<: *gpu-config
+    devices:
+      - /dev/video0:/dev/video0
+    volumes:
+      - ./webcam.launch.py:/webcam.launch.py
+    command: >
+      ros2 launch /webcam.launch.py
+        ffmpeg_encoding:=libx264
+        ffmpeg_preset:=ultrafast
+        ffmpeg_tune:=zerolatency
+
+  rviz:
+    image: husarion/rviz2:humble-ffmpeg-plugin
+    <<: *gpu-config
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./default.rviz:/root/.rviz2/default.rviz
+    environment:
+      - DISPLAY
+
+  image_decompressor:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+    <<: *gpu-config   
+    command: ros2 run image_transport republish ffmpeg in/ffmpeg:=/camera/image_raw/ffmpeg raw out:=image_raw/uncompressed
