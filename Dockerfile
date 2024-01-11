@@ -20,8 +20,7 @@ RUN mkdir src && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install --from-paths src --ignore-src -y && \
     MYDISTRO=${PREFIX:-ros}; MYDISTRO=${MYDISTRO//-/} && \
-    # source /opt/$MYDISTRO/$ROS_DISTRO/setup.bash && \
-    source /opt/ros/$ROS_DISTRO/setup.bash && \
+    source /opt/${MYDISTRO}/$ROS_DISTRO/setup.bash && \
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release  && \
     echo $(cat /ros2_ws/src/ffmpeg_image_transport/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt && \
     rm -rf build log

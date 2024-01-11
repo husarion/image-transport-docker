@@ -29,16 +29,12 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./default.rviz:/root/.rviz2/default.rviz
-      - ./rviz.launch.py:/ros2_ws/rviz.launch.py
     environment:
       - DISPLAY
-    command: >
-      ros2 launch rviz.launch.py
-        device_namespace:=camera
 
   image_decompressor:
     build:
-      context: ../..
+      context: ../../
       dockerfile: Dockerfile
     <<: *gpu-config   
     command: ros2 run image_transport republish ffmpeg in/ffmpeg:=/camera/image_raw/ffmpeg raw out:=image_raw/uncompressed
